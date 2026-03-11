@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cashflow Academy — Espace Membre</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0C14;--bg2:#10111D;--bg3:#16172A;--border:#1E2040;--purple:#7C3AED;--purple2:#A78BFA;--cyan:#06B6D4;--gold:#F59E0B;--green:#10B981;--red:#EF4444;--white:#F0F0FF;--muted:#5A5A7A;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* ══ LOGIN / REGISTER SCREENS ══ */
+.screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.screen.hidden{display:none;}
+.box{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:38px 32px;width:100%;max-width:400px;text-align:center;position:relative;}
+.box-logo{width:54px;height:54px;background:var(--purple);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;margin:0 auto 16px;}
+.box-title{font-family:'Syne',sans-serif;font-weight:800;font-size:21px;margin-bottom:5px;}
+.box-sub{font-size:12px;color:var(--muted);margin-bottom:26px;line-height:1.5;}
+.tabs{display:flex;gap:6px;margin-bottom:22px;background:var(--bg3);border-radius:10px;padding:4px;}
+.tab{flex:1;padding:8px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s;color:var(--muted);border:none;background:transparent;}
+.tab.on{background:var(--purple);color:#fff;}
+.inp{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;width:100%;margin-bottom:10px;transition:border .2s;}
+.inp:focus{border-color:var(--purple);}
+.inp::placeholder{color:var(--muted);}
+.btn-main{background:var(--purple);color:#fff;border:none;border-radius:10px;padding:13px;width:100%;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;margin-top:4px;}
+.btn-main:hover{background:var(--purple2);}
+.err{font-size:11px;color:var(--red);margin-top:6px;min-height:16px;}
+.success-msg{background:rgba(16,185,129,.1);border:1px solid var(--green);border-radius:10px;padding:14px;font-size:12px;color:var(--green);margin-top:10px;display:none;}
+.hint{font-size:10px;color:var(--muted);margin-top:14px;line-height:1.5;}
+.hint a{color:var(--purple2);cursor:pointer;}
+/* steps */
+.step-dots{display:flex;justify-content:center;gap:8px;margin-bottom:22px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.dot.on{background:var(--purple);width:24px;border-radius:4px;}
+.step{display:none;}
+.step.on{display:block;}
+
+/* ══ APP ══ */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:66px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;z-index:200;}
+.logo{width:38px;height:38px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#fff;margin-bottom:12px;cursor:pointer;}
+.sico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--muted);transition:all .2s;position:relative;}
+.sico:hover,.sico.on{background:var(--bg3);color:var(--white);}
+.sico.on::before{content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--purple);border-radius:0 3px 3px 0;}
+.tip{position:absolute;left:54px;background:#1E2040;color:var(--white);font-size:11px;padding:4px 10px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:999;border:1px solid var(--border);}
+.sico:hover .tip{opacity:1;}
+.sp{flex:1;}
+.adot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--gold);border-radius:50%;}
+
+.topbar{position:fixed;left:66px;right:0;top:0;height:54px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px;z-index:199;}
+.tb-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.tb-title span{color:var(--purple2);}
+.bc{font-size:11px;color:var(--muted);}
+.tf{flex:1;}
+.user-badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 4px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.user-av{width:26px;height:26px;background:linear-gradient(135deg,var(--purple),var(--cyan));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:10px;flex-shrink:0;}
+.user-email{font-size:11px;color:var(--muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.main{margin-left:66px;padding-top:54px;min-height:100vh;}
+.page{display:none;padding:26px 22px;animation:fadeUp .3s ease both;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+/* cards / components (same as before) */
+.wbanner{background:linear-gradient(135deg,var(--bg3),#1A1040);border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
+.wbanner::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(124,58,237,.18),transparent 70%);pointer-events:none;}
+.wt h2{font-family:'Syne',sans-serif;font-weight:800;font-size:19px;margin-bottom:4px;}
+.wt h2 span{color:var(--cyan);}
+.wt p{font-size:12px;color:var(--muted);}
+.rbtn{margin-top:10px;background:var(--purple);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;}
+.rbtn:hover{background:var(--purple2);}
+.ws{display:flex;gap:18px;}
+.wst{text-align:center;}
+.wsn{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--purple2);line-height:1;}
+.wsl{font-size:10px;color:var(--muted);margin-top:2px;font-family:'DM Mono',monospace;}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.st{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px;}
+.st::before{content:'';width:3px;height:13px;background:var(--purple);border-radius:2px;}
+.scnt{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.slnk{font-size:11px;color:var(--purple2);cursor:pointer;font-family:'DM Mono',monospace;}
+.pc{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:22px;}
+.pr{display:flex;align-items:center;gap:12px;margin-top:10px;}
+.pb{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.pf{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:3px;transition:width 1s ease;}
+.ppl{font-family:'DM Mono',monospace;font-size:12px;color:var(--purple2);white-space:nowrap;}
+.mbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;margin-top:12px;}
+.mbi{display:flex;flex-direction:column;gap:3px;}
+.mbl{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'DM Mono',monospace;}
+.mbt{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.mbf{height:100%;border-radius:2px;transition:width 1s ease;}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:24px;}
+.mc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);}
+.mc:hover{border-color:var(--purple);transform:translateY(-3px);box-shadow:0 10px 28px rgba(124,58,237,.16);}
+.mt{height:130px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.mto{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,var(--bg2));z-index:1;}
+.mpl{position:absolute;width:38px;height:38px;background:rgba(255,255,255,.1);backdrop-filter:blur(6px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;z-index:2;border:1px solid rgba(255,255,255,.18);transition:all .2s;}
+.mc:hover .mpl{background:var(--purple);transform:scale(1.1);}
+.mbadge{position:absolute;top:8px;left:8px;padding:2px 7px;border-radius:20px;font-size:9px;font-family:'DM Mono',monospace;font-weight:500;z-index:3;}
+.bd{background:var(--green);color:#0B0C14;}.bw{background:var(--red);color:#fff;}.bn{background:var(--cyan);color:#0B0C14;}.bb{background:var(--gold);color:#0B0C14;}
+.mi{padding:11px 13px 13px;}
+.mn{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:3px;letter-spacing:1px;}
+.mm{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:7px;line-height:1.3;}
+.mme{display:flex;align-items:center;justify-content:space-between;}
+.mlc{font-size:10px;color:var(--muted);}
+.pbw{display:flex;align-items:center;gap:5px;}
+.pbb{width:52px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.pbf{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .6s ease;}
+.ppc{font-family:'DM Mono',monospace;font-size:9px;color:var(--purple2);}
+.bg2g{display:grid;grid-template-columns:1fr 280px;gap:12px;margin-bottom:24px;}
+.ac{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px 20px;}
+.al{margin-top:12px;display:flex;flex-direction:column;gap:7px;}
+.ai{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--bg3);border-radius:9px;cursor:pointer;border:1px solid transparent;transition:border .2s;}
+.ai:hover{border-color:var(--border);}
+.aic{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ait{flex:1;}.aitn{font-size:12px;font-weight:500;}.aitss{font-size:10px;color:var(--muted);margin-top:1px;}
+.mrrb{background:linear-gradient(135deg,#0F0524,#1A0840);border:1px solid var(--purple);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;}
+.mrrb::before{content:'';position:absolute;right:-25px;bottom:-25px;width:120px;height:120px;background:radial-gradient(circle,rgba(124,58,237,.22),transparent 70%);}
+.mrrt{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;margin-bottom:4px;}
+.mrrs{font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+.mrrp{font-family:'Syne',sans-serif;font-weight:800;font-size:36px;color:var(--purple2);line-height:1;margin-bottom:2px;}
+.mrrps{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px;}
+.mrrsteps{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.mrrst{display:flex;align-items:center;gap:7px;font-size:11px;}
+.mrrd{width:17px;height:17px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:bold;flex-shrink:0;}
+.bmrr{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:9px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;width:100%;transition:all .2s;}
+.bmrr:hover{background:var(--purple2);}
+/* module detail */
+.mdl{display:grid;grid-template-columns:1fr 290px;gap:18px;align-items:start;}
+.vp{background:#000;border-radius:12px;overflow:hidden;margin-bottom:14px;aspect-ratio:16/9;}
+.vp iframe{width:100%;height:100%;border:0;}
+.vpph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0F0524,#0A1A2A);padding:20px;text-align:center;}
+.vpic{font-size:46px;}.vptit{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}.vpsub{font-size:11px;color:var(--muted);}
+.vpbtn{margin-top:6px;background:var(--purple);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;}
+.vpbtn:hover{background:var(--purple2);}
+.lib{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap;}
+.ltb{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;flex:1;}
+.lnav{display:flex;gap:7px;}
+.nb{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;color:var(--white);transition:all .2s;}
+.nb:hover{border-color:var(--purple);color:var(--purple2);}
+.nb.pri{background:var(--purple);border-color:var(--purple);}
+.nb.pri:hover{background:var(--purple2);}
+.lc-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+.lc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--purple2);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.lc-title::before{content:'';width:3px;height:13px;background:var(--purple);border-radius:2px;flex-shrink:0;}
+.lc-text{font-size:12px;color:var(--muted);line-height:1.75;}
+.lc-list{list-style:none;display:flex;flex-direction:column;gap:5px;margin-top:6px;}
+.lc-list li{font-size:12px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.lc-list li::before{content:'▸';color:var(--cyan);flex-shrink:0;margin-top:1px;}
+.lc-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px;}
+.lc-table th{background:var(--bg3);color:var(--muted);padding:7px 10px;text-align:left;font-weight:600;}
+.lc-table td{padding:7px 10px;border-top:1px solid var(--border);color:var(--white);}
+.lc-table tr:hover td{background:rgba(124,58,237,.05);}
+.lc-table .red{color:var(--red);}.lc-table .grn{color:var(--green);}
+.mdb{background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;}
+.mdb:hover{opacity:.85;}
+.mdb.done{background:var(--bg3);border:1px solid var(--border);color:var(--muted);}
+.ls{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:sticky;top:72px;}
+.lsh{padding:12px 14px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:700;font-size:12px;}
+.lsp{padding:9px 14px;border-bottom:1px solid var(--border);}
+.lspb{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:5px;}
+.lspf{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .5s ease;}
+.lsl{max-height:460px;overflow-y:auto;}
+.li{display:flex;align-items:center;gap:9px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;}
+.li:hover{background:var(--bg3);}
+.li.active{background:rgba(124,58,237,.1);border-left:3px solid var(--purple);}
+.li.completed .lck{background:var(--green);color:#fff;border-color:var(--green);}
+.lck{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;transition:all .2s;}
+.li.active .lck{border-color:var(--purple);color:var(--purple);}
+.lln{font-size:11px;flex:1;line-height:1.3;}.lld{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;}
+.bb2{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:18px;width:fit-content;}
+.bb2:hover{color:var(--white);}
+.prog-mod-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;margin-bottom:10px;}
+
+/* ══ ADMIN ══ */
+.admin-warn{background:rgba(245,158,11,.08);border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+.acard{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.acard h3{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.alabel{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:5px;margin-top:10px;}
+.ainp{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;width:100%;transition:border .2s;}
+.ainp:focus{border-color:var(--purple);}
+.ainp::placeholder{color:var(--muted);}
+.asel{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;width:100%;cursor:pointer;}
+.sbtn{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;margin-top:10px;transition:all .2s;width:100%;}
+.sbtn:hover{background:var(--purple2);}
+.sbtn.red{background:var(--red);}
+.sbtn.red:hover{background:#DC2626;}
+
+/* EMAIL LIST */
+.email-list{margin-top:12px;display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;}
+.email-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:8px;padding:8px 12px;}
+.email-addr{font-family:'DM Mono',monospace;font-size:11px;color:var(--white);}
+.email-date{font-size:10px;color:var(--muted);}
+.email-del{background:rgba(239,68,68,.1);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s;}
+.email-del:hover{background:var(--red);color:#fff;}
+.email-empty{font-size:12px;color:var(--muted);text-align:center;padding:20px;}
+.email-count{background:var(--purple);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-family:'DM Mono',monospace;margin-left:8px;}
+
+/* VIDEO ROWS */
+.vrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+.vrow:last-child{border-bottom:none;}
+.vrow-name{font-size:11px;color:var(--muted);flex:1;}
+.vrow-inp{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--white);font-family:'DM Mono',monospace;font-size:10px;outline:none;width:160px;}
+.vrow-inp:focus{border-color:var(--purple);}
+.vrow-inp.ok{border-color:var(--green);}
+
+/* MRR */
+.mrr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.mitem{border-radius:14px;padding:22px;border:1px solid;}
+.bdl{border:none;border-radius:8px;padding:10px;width:100%;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;margin-top:14px;transition:all .2s;}
+
+.toast{position:fixed;bottom:26px;right:26px;padding:10px 18px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;z-index:99999;transform:translateY(70px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);color:#fff;}
+.toast.error{background:var(--red);color:#fff;}
+.toast.info{background:var(--purple);color:#fff;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:860px){.bg2g,.mdl{grid-template-columns:1fr;}.ws{display:none;}.ls{position:static;}}
+@media(max-width:600px){.main{margin-left:0;}.sidebar{display:none;}.topbar{left:0;}}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div class="screen" id="loginScreen">
+  <div class="box">
+    <div class="box-logo">CA</div>
+    <div class="box-title">Cashflow Academy</div>
+    <div class="box-sub" id="loginSub">Connecte-toi avec l'email utilisé lors de ton achat sur Beacons.</div>
+
+    <div class="tabs">
+      <button class="tab on" onclick="switchLoginTab('member')" id="tab-m">👤 Membre</button>
+      <button class="tab" onclick="switchLoginTab('admin')" id="tab-a">⚙️ Admin</button>
+    </div>
+
+    <!-- MEMBER FLOW -->
+    <div id="memberFlow">
+      <div class="step-dots"><div class="dot on" id="d1"></div><div class="dot" id="d2"></div></div>
+
+      <!-- Step 1 : email -->
+      <div class="step on" id="step1">
+        <input class="inp" id="emailInp" placeholder="ton@email.com" type="email" />
+        <div class="err" id="emailErr"></div>
+        <button class="btn-main" onclick="checkEmail()">Vérifier mon accès →</button>
+        <div class="hint">T'as acheté sur Beacons ? Entre l'email exact utilisé lors du paiement.<br>Pas encore acheté ? <a onclick="showToast('Redirige vers Beacons !','info')">Acheter la formation →</a></div>
+      </div>
+
+      <!-- Step 2 : set password or login -->
+      <div class="step" id="step2">
+        <div style="background:rgba(16,185,129,.1);border:1px solid var(--green);border-radius:10px;padding:12px;font-size:12px;color:var(--green);margin-bottom:16px;" id="step2msg">✓ Email vérifié !</div>
+        <input class="inp" id="passInp" placeholder="Crée ton mot de passe" type="password" />
+        <input class="inp" id="passConfInp" placeholder="Confirme ton mot de passe" type="password" style="display:none;" />
+        <div class="err" id="passErr"></div>
+        <button class="btn-main" id="step2btn" onclick="doMemberAuth()">Accéder à ma formation →</button>
+        <div class="hint" style="margin-top:10px;"><a onclick="backToStep1()">← Changer d'email</a></div>
+      </div>
+    </div>
+
+    <!-- ADMIN FLOW -->
+    <div id="adminFlow" style="display:none;">
+      <input class="inp" id="adminPassInp" placeholder="Mot de passe admin" type="password" />
+      <div class="err" id="adminErr"></div>
+      <button class="btn-main" onclick="doAdminLogin()">Connexion Admin →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="logo">CA</div>
+  <div class="sico on" onclick="nav('dashboard')" id="ico-dashboard">🏠<span class="tip">Accueil</span></div>
+  <div class="sico" onclick="nav('modules')" id="ico-modules">📚<span class="tip">Modules</span></div>
+  <div class="sico" onclick="nav('progression')" id="ico-prog">📈<span class="tip">Progression</span></div>
+  <div class="sico" onclick="nav('mrr')" id="ico-mrr">💰<span class="tip">Kit MRR</span></div>
+  <div class="sp"></div>
+  <div class="sico" id="ico-admin" style="display:none;" onclick="nav('admin')">⚙️<div class="adot"></div><span class="tip">Admin</span></div>
+  <div class="sico" onclick="logout()">🚪<span class="tip">Déconnexion</span></div>
+</nav>
+
+<header class="topbar">
+  <div class="tb-title">Cashflow <span>Academy</span></div>
+  <div class="bc">/ <span id="bctxt">Accueil</span></div>
+  <div class="tf"></div>
+  <div class="user-badge" onclick="nav('progression')">
+    <div class="user-av" id="userAv">?</div>
+    <div class="user-email" id="userEmail">—</div>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="wbanner">
+    <div class="wt">
+      <h2>Bienvenue, <span id="userName">—</span> 👋</h2>
+      <p id="rsub">Continue ta formation</p>
+      <button class="rbtn" onclick="resumeLearning()">▶ Reprendre</button>
+    </div>
+    <div class="ws">
+      <div class="wst"><div class="wsn" id="ws1">0</div><div class="wsl">Leçons</div></div>
+      <div class="wst"><div class="wsn" id="ws2">0%</div><div class="wsl">Progression</div></div>
+      <div class="wst"><div class="wsn" id="ws3">0</div><div class="wsl">Modules finis</div></div>
+    </div>
+  </div>
+  <div class="pc">
+    <div class="sh" style="margin-bottom:0"><div class="st">Progression globale</div><div class="scnt" id="pcnt">0/40</div></div>
+    <div class="pr"><div class="pb"><div class="pf" id="gbar"></div></div><div class="ppl" id="gpct">0%</div></div>
+    <div class="mbs" id="minibars"></div>
+  </div>
+  <div class="sh"><div class="st">Modules <span class="scnt">9</span></div><span class="slnk" onclick="nav('modules')">Tout voir →</span></div>
+  <div class="mg" id="dashgrid"></div>
+  <div class="bg2g">
+    <div class="ac"><div class="sh" style="margin-bottom:0"><div class="st">Reprendre</div></div><div class="al" id="actlist"></div></div>
+    <div class="mrrb">
+      <div class="mrrt">💰 Revends & Gagne</div>
+      <div class="mrrs">Tu as les droits MRR. Chaque vente 197€ = 100% pour toi.</div>
+      <div class="mrrp">197€</div><div class="mrrps">par vente · 100% pour toi</div>
+      <div class="mrrsteps">
+        <div class="mrrst"><div class="mrrd">1</div>Télécharge le kit</div>
+        <div class="mrrst"><div class="mrrd">2</div>Poste des TikToks</div>
+        <div class="mrrst"><div class="mrrd">3</div>Encaisse 100%</div>
+      </div>
+      <button class="bmrr" onclick="nav('mrr')">Accéder au Kit MRR →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<div class="page" id="page-modules">
+  <div class="sh"><div class="st">Tous les modules <span class="scnt">9</span></div>
+    <div class="sw" style="position:relative;display:flex;align-items:center;">
+      <span style="position:absolute;left:9px;color:var(--muted);font-size:14px;pointer-events:none;">⌕</span>
+      <input style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px 6px 28px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;width:170px;" placeholder="Chercher..." oninput="searchM(this.value)">
+    </div>
+  </div>
+  <div class="mg" id="allgrid"></div>
+</div>
+
+<!-- MODULE DETAIL -->
+<div class="page" id="page-module-detail">
+  <div class="bb2" onclick="goBack()">← Retour</div>
+  <div class="mdl">
+    <div>
+      <div class="vp" id="vplayer"></div>
+      <div class="lib">
+        <div class="ltb" id="ltitle">—</div>
+        <div class="lnav">
+          <button class="nb" onclick="prevL()">← Préc.</button>
+          <button class="nb pri" onclick="nextL()">Suiv. →</button>
+        </div>
+      </div>
+      <div id="lesson-content"></div>
+      <button class="mdb" id="mdbtn" onclick="markDone()">✓ Marquer comme vu</button>
+    </div>
+    <div class="ls">
+      <div class="lsh" id="lsh">Module</div>
+      <div class="lsp">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);"><span>Progression</span><span id="lspt">0%</span></div>
+        <div class="lspb"><div class="lspf" id="lspf"></div></div>
+      </div>
+      <div class="lsl" id="llist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESSION -->
+<div class="page" id="page-progression">
+  <div class="sh"><div class="st">Progression détaillée</div></div>
+  <div id="progdetail"></div>
+</div>
+
+<!-- MRR -->
+<div class="page" id="page-mrr">
+  <div class="sh"><div class="st">💰 Kit Master Resell Rights</div></div>
+  <div id="tg-banner" style="display:none;background:rgba(6,182,212,.08);border:1px solid var(--cyan);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;">
+    <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:3px;">💬 Communauté Telegram</div><div style="font-size:11px;color:var(--muted);" id="tg-disp">Non configuré</div></div>
+    <button onclick="openTg()" style="background:var(--cyan);color:#0B0C14;border:none;border-radius:8px;padding:8px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">Rejoindre →</button>
+  </div>
+  <div class="mrr-grid">
+    <div class="mitem" style="background:linear-gradient(135deg,#0F0524,#1A0840);border-color:var(--purple);"><div style="font-size:32px;margin-bottom:10px;">📜</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px;">Licence MRR</div><div style="font-size:11px;color:var(--muted);line-height:1.6;">Document légal pour revendre à 197€ et garder 100%.</div><button class="bdl" style="background:var(--purple);color:#fff;" onclick="showToast('📜 Licence téléchargée !','success')">Télécharger</button></div>
+    <div class="mitem" style="background:linear-gradient(135deg,#1A1000,#2A2000);border-color:var(--gold);"><div style="font-size:32px;margin-bottom:10px;">📱</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px;">20 Scripts TikTok</div><div style="font-size:11px;color:var(--muted);line-height:1.6;">Scripts prêts à filmer.</div><button class="bdl" style="background:var(--gold);color:#0B0C14;" onclick="showToast('📱 Scripts téléchargés !','success')">Télécharger</button></div>
+    <div class="mitem" style="background:linear-gradient(135deg,#001A1A,#0A2A2A);border-color:var(--cyan);"><div style="font-size:32px;margin-bottom:10px;">🎨</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px;">Kit Visuel Canva</div><div style="font-size:11px;color:var(--muted);line-height:1.6;">Visuels TikTok/Insta modifiables.</div><button class="bdl" style="background:var(--cyan);color:#0B0C14;" onclick="showToast('🎨 Canva ouvert !','info')">Accéder</button></div>
+    <div class="mitem" style="background:linear-gradient(135deg,#1A0010,#2A0018);border-color:#EC4899;"><div style="font-size:32px;margin-bottom:10px;">💬</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px;">Communauté Telegram</div><div style="font-size:11px;color:var(--muted);line-height:1.6;" id="tg-desc2">Rejoins le groupe privé.</div><button class="bdl" style="background:#EC4899;color:#fff;" onclick="openTg()">Rejoindre</button></div>
+    <div class="mitem" style="background:var(--bg2);border-color:var(--border);"><div style="font-size:32px;margin-bottom:10px;">📊</div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:6px;">Tableau de Suivi</div><div style="font-size:11px;color:var(--muted);line-height:1.6;">Excel pour tracker tes ventes.</div><button class="bdl" style="background:var(--bg3);border:1px solid var(--border);color:var(--white);" onclick="showToast('📊 Tableau téléchargé !','success')">Télécharger</button></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="admin-warn">⚙️ Panel Admin — Seul toi (Ilyas) vois cette page.</div>
+  <div class="admin-grid">
+
+    <!-- EMAIL MANAGER -->
+    <div class="acard" style="grid-column:1/-1;">
+      <h3>📧 Acheteurs autorisés <span class="email-count" id="emailCountBadge">0</span></h3>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Après chaque vente sur Beacons, ajoute ici l'email de l'acheteur. Il pourra alors se connecter avec cet email.</div>
+      <div style="display:flex;gap:8px;">
+        <input class="ainp" id="newEmailInp" placeholder="email@acheteur.com" type="email" style="flex:1;" onkeydown="if(event.key==='Enter')addEmail()" />
+        <button onclick="addEmail()" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;">+ Ajouter</button>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+        <textarea class="ainp" id="bulkEmailInp" placeholder="Colle plusieurs emails d'un coup (un par ligne ou séparés par virgule)" style="height:70px;resize:none;font-family:'DM Mono',monospace;font-size:11px;"></textarea>
+      </div>
+      <button onclick="addBulkEmails()" style="background:var(--purple);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;margin-top:8px;">Importer en masse</button>
+      <div class="email-list" id="emailList"></div>
+    </div>
+
+    <!-- TELEGRAM -->
+    <div class="acard">
+      <h3>🔗 Lien Telegram</h3>
+      <div class="alabel">Lien invite (t.me/...)</div>
+      <input class="ainp" id="tgInp" placeholder="https://t.me/ton_groupe" />
+      <button class="sbtn" onclick="saveTg()">Sauvegarder</button>
+    </div>
+
+    <!-- MOT DE PASSE ADMIN -->
+    <div class="acard">
+      <h3>🔑 Mot de passe Admin</h3>
+      <div class="alabel">Nouveau mot de passe admin</div>
+      <input class="ainp" id="newAdminPw" type="password" placeholder="••••••••" />
+      <div class="alabel">Confirmer</div>
+      <input class="ainp" id="newAdminPw2" type="password" placeholder="••••••••" />
+      <button class="sbtn" onclick="saveAdminPw()">Changer le mot de passe</button>
+    </div>
+
+    <!-- VIDEOS -->
+    <div class="acard" style="grid-column:1/-1;">
+      <h3>🎬 Vidéos des leçons</h3>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Colle l'URL YouTube de chaque vidéo. Laisse vide si pas encore filmé.</div>
+      <div class="alabel">Module</div>
+      <select class="asel" id="adminModSel" onchange="renderAdminVids()">
+        <option value="">-- Choisir un module --</option>
+      </select>
+      <div id="adminVidsList" style="margin-top:12px;"></div>
+      <button class="sbtn" id="saveVidsBtn" style="display:none;" onclick="saveVids()">💾 Sauvegarder les vidéos</button>
+    </div>
+
+  </div>
+</div>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// STORAGE HELPERS
+// ══════════════════════════════════════════
+const S = {
+  get:(k,d='')=>{ try{ const v=localStorage.getItem('ca2_'+k); return v!==null?JSON.parse(v):d; }catch(e){return d;} },
+  set:(k,v)=>{ try{ localStorage.setItem('ca2_'+k,JSON.stringify(v)); }catch(e){} }
+};
+
+// ══════════════════════════════════════════
+// DEFAULT CONFIG
+// ══════════════════════════════════════════
+const ADMIN_PW_DEFAULT = 'ilyas78admin';
+
+function getAdminPw(){ return S.get('adminpw', ADMIN_PW_DEFAULT); }
+function getEmails(){ return S.get('emails', {}); } // {email: {date, name, pwHash}}
+function setEmails(e){ S.set('emails', e); }
+function getProg(){ return S.get('prog_'+currentUser, {}); }
+function setProg(p){ S.set('prog_'+currentUser, p); }
+function getVideos(){ return S.get('videos', {}); }
+function setVideos(v){ S.set('videos', v); }
+
+// ══════════════════════════════════════════
+// SESSION
+// ══════════════════════════════════════════
+let currentUser = '';
+let isAdmin = false;
+let loginMode = 'member';
+let pendingEmail = '';
+let pendingIsNew = false;
+
+function simpleHash(s){ let h=0; for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;} return h.toString(36); }
+
+// ══════════════════════════════════════════
+// LOGIN UI
+// ══════════════════════════════════════════
+function switchLoginTab(t){
+  loginMode=t;
+  document.getElementById('tab-m').classList.toggle('on',t==='member');
+  document.getElementById('tab-a').classList.toggle('on',t==='admin');
+  document.getElementById('memberFlow').style.display=t==='member'?'block':'none';
+  document.getElementById('adminFlow').style.display=t==='admin'?'block':'none';
+  document.getElementById('emailErr').textContent='';
+  document.getElementById('adminErr').textContent='';
+}
+
+function checkEmail(){
+  const email = document.getElementById('emailInp').value.trim().toLowerCase();
+  const err = document.getElementById('emailErr');
+  if(!email || !email.includes('@')){ err.textContent='Entre un email valide.'; return; }
+  const emails = getEmails();
+  if(!emails[email]){ err.textContent='❌ Cet email n\'est pas autorisé. Vérifie ton achat sur Beacons ou contacte Ilyas.'; return; }
+  err.textContent='';
+  pendingEmail = email;
+  // check if already has password
+  if(emails[email].pwHash){
+    pendingIsNew = false;
+    document.getElementById('step2msg').textContent='✓ Email reconnu ! Entre ton mot de passe.';
+    document.getElementById('step2msg').style.background='rgba(124,58,237,.1)';
+    document.getElementById('step2msg').style.borderColor='var(--purple)';
+    document.getElementById('step2msg').style.color='var(--purple2)';
+    document.getElementById('passInp').placeholder='Ton mot de passe';
+    document.getElementById('passConfInp').style.display='none';
+    document.getElementById('step2btn').textContent='Me connecter →';
+  } else {
+    pendingIsNew = true;
+    document.getElementById('step2msg').textContent='✅ Email vérifié ! Crée ton mot de passe pour accéder à ta formation.';
+    document.getElementById('step2msg').style.background='rgba(16,185,129,.1)';
+    document.getElementById('step2msg').style.borderColor='var(--green)';
+    document.getElementById('step2msg').style.color='var(--green)';
+    document.getElementById('passInp').placeholder='Crée un mot de passe';
+    document.getElementById('passConfInp').style.display='block';
+    document.getElementById('step2btn').textContent='Créer mon compte →';
+  }
+  // go to step 2
+  document.getElementById('step1').classList.remove('on');
+  document.getElementById('step2').classList.add('on');
+  document.getElementById('d1').classList.remove('on');
+  document.getElementById('d2').classList.add('on');
+}
+
+function backToStep1(){
+  document.getElementById('step2').classList.remove('on');
+  document.getElementById('step1').classList.add('on');
+  document.getElementById('d2').classList.remove('on');
+  document.getElementById('d1').classList.add('on');
+  document.getElementById('passInp').value='';
+  document.getElementById('passConfInp').value='';
+  document.getElementById('passErr').textContent='';
+}
+
+function doMemberAuth(){
+  const pass = document.getElementById('passInp').value;
+  const err = document.getElementById('passErr');
+  if(!pass || pass.length < 4){ err.textContent='Mot de passe trop court (4 caractères minimum).'; return; }
+  const emails = getEmails();
+  if(pendingIsNew){
+    const conf = document.getElementById('passConfInp').value;
+    if(pass !== conf){ err.textContent='Les mots de passe ne correspondent pas.'; return; }
+    emails[pendingEmail].pwHash = simpleHash(pass);
+    setEmails(emails);
+    showToast('🎉 Compte créé ! Bienvenue !','success');
+  } else {
+    if(simpleHash(pass) !== emails[pendingEmail].pwHash){ err.textContent='Mot de passe incorrect.'; return; }
+  }
+  err.textContent='';
+  loginAsMember(pendingEmail, emails[pendingEmail]);
+}
+
+function doAdminLogin(){
+  const pw = document.getElementById('adminPassInp').value;
+  if(pw === getAdminPw()){
+    isAdmin=true; currentUser='__admin__';
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('ico-admin').style.display='flex';
+    document.getElementById('userEmail').textContent='Admin — Ilyas';
+    document.getElementById('userAv').textContent='IL';
+    document.getElementById('userName').textContent='Ilyas (Admin)';
+    renderDash();
+    showToast('✅ Connecté en admin','success');
+  } else {
+    document.getElementById('adminErr').textContent='Mot de passe admin incorrect.';
+  }
+}
+
+function loginAsMember(email, data){
+  currentUser = email;
+  isAdmin = false;
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('ico-admin').style.display='none';
+  const initials = email.substring(0,2).toUpperCase();
+  document.getElementById('userAv').textContent=initials;
+  document.getElementById('userEmail').textContent=email;
+  const firstName = data.name || email.split('@')[0];
+  document.getElementById('userName').textContent=firstName;
+  renderDash();
+  showToast('👋 Bienvenue '+firstName+' !','success');
+}
+
+function logout(){
+  currentUser=''; isAdmin=false; pendingEmail=''; pendingIsNew=false;
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('emailInp').value='';
+  document.getElementById('passInp').value='';
+  document.getElementById('passConfInp').value='';
+  document.getElementById('adminPassInp').value='';
+  document.getElementById('emailErr').textContent='';
+  document.getElementById('adminErr').textContent='';
+  backToStep1();
+  switchLoginTab('member');
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function nav(name,extras){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sico').forEach(s=>s.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('active');
+  const ico=document.getElementById('ico-'+name);
+  if(ico)ico.classList.add('on');
+  const bc={dashboard:'Accueil',modules:'Modules',progression:'Progression',mrr:'Kit MRR',admin:'Admin','module-detail':extras?.title||'Module'};
+  document.getElementById('bctxt').textContent=bc[name]||name;
+  if(name==='dashboard') renderDash();
+  if(name==='modules') renderAllMods();
+  if(name==='progression') renderProg();
+  if(name==='admin') renderAdmin();
+  if(name==='mrr') renderMRR();
+}
+
+// ══════════════════════════════════════════
+// MODULE DATA
+// ══════════════════════════════════════════
+const MODULES = [
+  {id:0,num:'MODULE 01',emoji:'🎯',bg:'linear-gradient(135deg,#0F0524,#3B0764)',title:'Présentation & Mon Histoire',color:'var(--cyan)',lessons:[
+    {title:'Introduction : Qui est Ilyas ?',dur:'8 min',content:[{type:'text',label:'Présentation',text:'Je m\'appelle <strong>Ilyas</strong>, j\'ai <strong>17 ans</strong> et j\'habite dans les <strong>Yvelines (78)</strong>. J\'ai commencé à gagner de l\'argent en ligne avant même d\'avoir mon bac, sans réseau, sans capital.'},{type:'list',label:'Ce que tu vas apprendre',items:['Générer tes premiers revenus en ligne ce mois','Le système MRR : acheter une formation et la revendre 100% bénéfice','Utiliser TikTok pour attirer des clients gratuitement','La méthode de vente que j\'utilise chaque jour','Gérer ton argent intelligemment dès le début']}]},
+    {title:'Mon histoire complète',dur:'14 min',content:[{type:'text',label:'2022 — La galère',text:'J\'étais en <strong>seconde</strong>, zéro euro, zéro expérience, zéro réseau.'},{type:'text',label:'2023 — Les échecs',text:'Dropshipping : zéro vente. Affiliation : pareil. J\'ai failli tout arrêter.'},{type:'text',label:'2023 — La découverte MRR',text:'J\'ai découvert les <strong>Master Resell Rights</strong>. Première vente en <strong>11 jours</strong>.'},{type:'text',label:'2024 — Les résultats',text:'Plusieurs ventes par semaine. Je te partage tout dans cette formation.'}]},
+    {title:'Comment utiliser cette formation',dur:'5 min',content:[{type:'list',label:'Les règles pour réussir',items:['Lis chaque module dans l\'ordre','Prends des notes sur chaque leçon','Applique immédiatement après chaque module','L\'action bat toujours la théorie']},{type:'text',label:'Objectif',text:'En <strong>30 jours</strong>, si tu appliques tout, tu seras capable de faire tes premières ventes.'}]},
+    {title:'PDF : Tes objectifs',dur:'PDF',content:[{type:'list',label:'Questions à te poser maintenant',items:['Combien tu veux gagner par mois dans 30 jours ?','Pourquoi tu veux gagner de l\'argent en ligne ?','Combien d\'heures par jour tu peux y consacrer ?','Qu\'est-ce qui t\'a empêché de réussir jusqu\'ici ?']}]},
+  ]},
+  {id:1,num:'MODULE 02',emoji:'🧠',bg:'linear-gradient(135deg,#000,#1A0030)',title:'Mindset & Fondations Mentales',color:'var(--purple2)',lessons:[
+    {title:'Pourquoi 95% des gens échouent',dur:'10 min',content:[{type:'text',label:'La vérité',text:'<strong>95% des gens</strong> échouent. Pas par manque d\'infos — par manque de <strong>mindset</strong>.'},{type:'list',label:'Les vraies raisons',items:['<strong>Peur de l\'échec</strong> : ils ne commencent pas','<strong>Syndrome de l\'imposteur</strong> : "je suis pas légitime"','<strong>Attendre le bon moment</strong> : qui n\'arrive jamais','<strong>Chercher la perfection</strong> : sans jamais publier']}]},
+    {title:'Éliminer les croyances limitantes',dur:'12 min',content:[{type:'table',label:'Mentalité perdante vs gagnante',headers:['Mentalité PERDANTE','Mentalité GAGNANTE'],rows:[["J'ai pas le temps","Je FAIS du temps"],["Ça marchera pas pour moi","Je teste et j'adapte"],["Je suis trop jeune","Mon âge est un avantage"],["J'attends d'être prêt","Je me prépare en faisant"]],colColors:['red','grn']}]},
+    {title:'Les 3 règles d\'or du winner',dur:'9 min',content:[{type:'text',label:'Règle 1',text:'<strong>Agis d\'abord, perfectionne ensuite.</strong> Imparfait et publié bat parfait et jamais sorti.'},{type:'text',label:'Règle 2',text:'<strong>Sois constant, pas intense.</strong> 1h/jour tous les jours > 10h une fois par semaine.'},{type:'text',label:'Règle 3',text:'<strong>Investis en toi-même.</strong> Chaque euro dépensé pour apprendre te revient au centuple.'}]},
+    {title:'Ta routine quotidienne',dur:'11 min',content:[{type:'list',label:'Ma routine exacte',items:['<strong>Matin</strong> : 3 tâches prioritaires du jour','<strong>Après-midi</strong> : 1 vidéo TikTok minimum','<strong>Soir</strong> : répondre aux DMs, analyser les stats','<strong>Avant dormir</strong> : bilan + planifier demain']}]},
+    {title:'Tableau : mindset en pratique',dur:'7 min',content:[{type:'list',label:'Situations réelles + bonnes réactions',items:['Vidéo à 50 vues → <strong>analyser le hook, pas abandonner</strong>','Pas de vente cette semaine → <strong>changer de type de contenu</strong>','Commentaire négatif → <strong>répondre calmement, ignorer les trolls</strong>','Envie de procrastiner → <strong>timer 25min et commencer quand même</strong>']}]},
+    {title:'PDF : Checklist mindset',dur:'PDF',content:[{type:'list',label:'À cocher chaque matin',items:['☐ J\'ai défini mes 3 priorités du jour','☐ Je suis concentré sur ce que je contrôle','☐ J\'ai éliminé les distractions','☐ Je vais publier au moins 1 contenu aujourd\'hui','☐ Je choisis l\'action plutôt que la procrastination']}]},
+  ]},
+  {id:2,num:'MODULE 03',emoji:'📱',bg:'linear-gradient(135deg,#2D0056,#DB2777)',title:'TikTok Marketing & Contenu Viral',color:'#EC4899',lessons:[
+    {title:'Pourquoi TikTok en 2024',dur:'6 min',content:[{type:'text',label:'L\'opportunité unique',text:'TikTok est la <strong>seule plateforme</strong> où un compte à 0 abonnés peut toucher 10 000 personnes en 24h gratuitement.'},{type:'list',label:'Pourquoi TikTok',items:['Portée organique massive depuis 0 abonnés','Contenu court plus facile à créer','Algorithme basé sur la qualité, pas l\'ancienneté','Communauté business très active']}]},
+    {title:'L\'algorithme décortiqué',dur:'13 min',content:[{type:'list',label:'Comment l\'algo décide',items:['<strong>0-3 sec</strong> : hook immédiat sinon la vidéo meurt','<strong>Rétention</strong> : plus les gens regardent jusqu\'au bout, mieux c\'est','<strong>Interactions</strong> : commentaires, partages, likes','<strong>Profil visité</strong> : si les gens cliquent, très positif','<strong>Constance</strong> : publier régulièrement est récompensé']}]},
+    {title:'Les 5 types de vidéos qui vendent',dur:'15 min',content:[{type:'list',label:'Les 5 formats',items:['<strong>Storytelling</strong> : ton histoire honnête','<strong>Proof of concept</strong> : screenshots, notifications de ventes','<strong>Valeur gratuite</strong> : tips utiles → confiance → achat','<strong>FAQ/Objections</strong> : réponds aux questions avant qu\'elles arrivent','<strong>CTA direct</strong> : montre la formation, appelle à l\'action']}]},
+    {title:'Créer un hook qui arrête le scroll',dur:'10 min',content:[{type:'list',label:'Formules de hooks qui marchent',items:['<strong>Chiffre</strong> : "J\'ai fait 500€ cette semaine à 17 ans"','<strong>Question douleur</strong> : "T\'en as marre de demander de l\'argent à tes parents ?"','<strong>Contre-intuitif</strong> : "Pourquoi j\'espère que tu n\'achètes pas ma formation"','<strong>Story</strong> : "Il y a 6 mois j\'avais 0€. Voilà ce qui s\'est passé"']}]},
+    {title:'Filmer avec son téléphone',dur:'9 min',content:[{type:'list',label:'Setup simple',items:['<strong>Lumière</strong> : fenêtre face à toi, jamais derrière','<strong>Son</strong> : pièce calme, micro des écouteurs','<strong>Montage</strong> : CapCut gratuit, sous-titres auto','<strong>Format</strong> : vertical 9:16, 15-30 secondes']}]},
+    {title:'Analyser ses stats TikTok',dur:'8 min',content:[{type:'list',label:'Métriques importantes',items:['<strong>Taux de rétention</strong> : vise 70%+','<strong>Vues profil</strong> : combien cliquent sur ton profil','<strong>Clics lien bio</strong> : combien vont vers ta page de vente']}]},
+    {title:'Optimiser son profil',dur:'7 min',content:[{type:'list',label:'Chaque élément compte',items:['<strong>Nom</strong> : simple, mémorable','<strong>Photo</strong> : visage visible, fond propre','<strong>Bio</strong> : ce que tu fais + CTA avec lien','<strong>Vidéo épinglée</strong> : ta meilleure vidéo de présentation']}]},
+    {title:'PDF : 20 scripts TikTok',dur:'PDF',content:[{type:'list',label:'Scripts disponibles',items:['Scripts 1-5 : Hooks chiffres','Scripts 6-10 : Storytelling','Scripts 11-15 : FAQ objections','Scripts 16-20 : CTA directs']}]},
+  ]},
+  {id:3,num:'MODULE 04',emoji:'💬',bg:'linear-gradient(135deg,#1A0000,#7F1D1D)',title:'Stratégie de Vente & Copywriting',color:'var(--red)',lessons:[
+    {title:'La méthode AIDA',dur:'12 min',content:[{type:'list',label:'AIDA appliqué à TikTok',items:['<strong>A — Attention</strong> : hook qui stoppe le scroll','<strong>I — Intérêt</strong> : tu comprends leur problème mieux qu\'eux','<strong>D — Désir</strong> : montre la transformation, pas le produit','<strong>A — Action</strong> : un seul CTA clair']},{type:'text',label:'Règle d\'or',text:'<strong>Ne parle jamais du produit, parle de la transformation.</strong>'}]},
+    {title:'Écrire une caption qui convertit',dur:'10 min',content:[{type:'text',label:'Exemple concret',text:'"J\'ai fait 500€ cette semaine à 17 ans 🤑<br>Voilà les 3 étapes exactes que j\'ai utilisées.<br>La formation complète est en bio 👆"'}]},
+    {title:'Setup Systeme.io en 30 min',dur:'18 min',content:[{type:'list',label:'Étapes',items:['Créer un compte gratuit sur systeme.io','Cliquer sur "Formations" → "Nouvelle formation"','Créer les modules et uploader tes vidéos','Configurer le prix à 197€','Tester le parcours d\'achat de bout en bout']}]},
+    {title:'Connecter Stripe et encaisser',dur:'8 min',content:[{type:'list',label:'Setup en 20 minutes',items:['Créer un compte Stripe (gratuit)','Vérifier ton identité','Connecter Stripe dans Systeme.io','Faire un paiement test de 1€']},{type:'text',label:'Info',text:'Stripe prend <strong>1.4% + 0.25€</strong> par transaction. Sur 197€ = tu gardes environ <strong>194€</strong>.'}]},
+    {title:'Gérer les objections par DM',dur:'11 min',content:[{type:'table',label:'Objections + réponses',headers:['Objection','Ta réponse'],rows:[["C'est trop cher","197€ une fois. 1 vente = investissement récupéré."],["Ça marche pas","Montre ta preuve. Screenshots, notifications."],["J'ai pas le temps","1h/jour suffit. Explique ta routine."],["J'y connais rien","La formation est faite pour ça. 0 expérience requise."]],colColors:['','']}]},
+    {title:'Templates de messages',dur:'8 min',content:[{type:'text',label:'Message de relance DM',text:'"Salut ! Tu m\'as demandé des infos sur la formation. Elle est dispo à 197€ avec droits de revente. Tu as des questions ?"'}]},
+    {title:'PDF : Templates copywriting',dur:'PDF',content:[{type:'list',label:'Contenu',items:['15 captions TikTok prêtes','5 templates de DMs de vente','3 réponses aux objections','Checklist avant publication']}]},
+  ]},
+  {id:4,num:'MODULE 05',emoji:'📅',bg:'linear-gradient(135deg,#001A1A,#0E4D4D)',title:'Coaching — Plan d\'Action 30 Jours',color:'var(--cyan)',lessons:[
+    {title:'Semaine 1 : Setup',dur:'10 min',content:[{type:'list',label:'Jours 1-7',items:['Jour 1 : lire toute la formation','Jour 2 : créer Systeme.io + tunnel','Jour 3 : connecter Stripe','Jour 4 : TikTok dédié + bio','Jour 5 : première vidéo postée','Jour 6-7 : 2 vidéos + analyser stats']}]},
+    {title:'Semaine 2 : Contenu',dur:'10 min',content:[{type:'list',label:'Jours 8-14',items:['1 vidéo TikTok par jour minimum','Tester différents hooks','Analyser les stats','Répondre à TOUS les commentaires','<strong>Objectif : première vente</strong>']}]},
+    {title:'Semaine 3 : Optimiser',dur:'10 min',content:[{type:'list',label:'Jours 15-21',items:['Doubler sur les vidéos qui marchent','Créer une série (Episode 1, 2, 3...)','Collecter des emails','<strong>Objectif : 3-5 ventes</strong>']}]},
+    {title:'Semaine 4 : Scaler',dur:'10 min',content:[{type:'list',label:'Jours 22-30',items:['Réinvestir 20% dans pub TikTok','Contenu social proof','<strong>Objectif : 10+ ventes</strong>']}]},
+    {title:'Les erreurs à éviter',dur:'14 min',content:[{type:'list',label:'7 erreurs que j\'ai faites pour toi',items:['Attendre la perfection avant de lancer','Poster puis disparaître','Ignorer les stats','Baisser le prix','Trop de plateformes à la fois','Ne pas relancer les prospects','Dépenser tout dès la 1ère vente']}]},
+    {title:'PDF : Checklist 30 jours',dur:'PDF',content:[{type:'list',label:'À faire chaque jour',items:['☐ 1 vidéo TikTok postée','☐ Stats analysées','☐ DMs répondus','☐ 1 chose apprise','☐ Objectif de demain défini']}]},
+  ]},
+  {id:5,num:'MODULE 06',emoji:'💵',bg:'linear-gradient(135deg,#1A1000,#78350F)',title:'Gestion de l\'Argent & Investissement',color:'var(--gold)',lessons:[
+    {title:'La règle des 3 tiers',dur:'11 min',content:[{type:'list',label:'Répartir chaque vente',items:['<strong>1/3 Réinvestissement</strong> : pub, formations, outils','<strong>1/3 Épargne</strong> : compte séparé, ne se touche pas','<strong>1/3 Toi-même</strong> : récompense-toi']},{type:'text',label:'Sur 197€',text:'65€ réinvestissement + 65€ épargne + 67€ pour toi.'}]},
+    {title:'Où mettre son argent à 17 ans',dur:'9 min',content:[{type:'list',label:'Options concrètes',items:['<strong>Livret A</strong> : sécurisé et disponible','<strong>Compte épargne séparé</strong>','<strong>Réinvestir en formation avancée</strong>','<strong>Pub TikTok</strong> : booster tes vidéos']}]},
+    {title:'Fiscalité des revenus en ligne',dur:'13 min',content:[{type:'text',label:'Ce que tu dois savoir',text:'Si tu gagnes de l\'argent en ligne, <strong>tu dois le déclarer</strong>. Le régime micro-entreprise est le plus simple.'},{type:'list',label:'Étapes si tu gagnes régulièrement',items:['Créer une micro-entreprise sur autoentrepreneur.urssaf.fr','Déclarer ton CA tous les mois','Payer les cotisations (~22% du CA)','Parler à tes parents si tu as moins de 18 ans']}]},
+    {title:'Les 5 pièges financiers',dur:'8 min',content:[{type:'list',label:'Erreurs à éviter',items:['<strong>Lifestyle inflation</strong> : dépenser plus dès que tu gagnes plus','<strong>Ne pas déclarer</strong> : risque fiscal','<strong>Tout dans une source</strong> : diversifie','<strong>Formations infinies</strong> : sans jamais appliquer','<strong>Se comparer</strong> : les chiffres TikTok sont souvent faux']}]},
+    {title:'PDF : Tableau de suivi',dur:'PDF',content:[{type:'text',label:'Contenu',text:'Excel avec colonnes : date, montant, 1/3 réinvest, 1/3 épargne, 1/3 perso. Total automatique.'}]},
+  ]},
+  {id:6,num:'BONUS 01',emoji:'📄',bg:'linear-gradient(135deg,#001A08,#14532D)',title:'20 Scripts TikTok Prêts à Filmer',color:'var(--green)',lessons:[
+    {title:'Scripts 1-5 : Hooks résultats',dur:'PDF',content:[{type:'list',label:'Scripts',items:['Script 1 : "J\'ai fait [X€] cette semaine à [âge] ans"','Script 2 : "Notification de vente pendant le lycée"','Script 3 : "[X] ventes en [Y] jours"','Script 4 : "Mon Stripe ce matin"','Script 5 : "De 0€ à [X€]/mois — timeline"']}]},
+    {title:'Scripts 6-10 : Storytelling',dur:'PDF',content:[{type:'list',label:'Scripts',items:['Script 6 : "Il y a 6 mois j\'avais 0€"','Script 7 : "J\'ai failli arrêter"','Script 8 : "Les 3 erreurs qui m\'ont coûté des semaines"','Script 9 : "Pourquoi j\'ai choisi le MRR"','Script 10 : "Ce que j\'aurais aimé savoir avant"']}]},
+    {title:'Scripts 11-15 : FAQ',dur:'PDF',content:[{type:'list',label:'Scripts',items:['Script 11 : "C\'est arnaque ? Réponse honnête"','Script 12 : "Tu dis que c\'est trop cher"','Script 13 : "J\'ai pas le temps — mon organisation"','Script 14 : "Est-ce que ça marche vraiment ?"','Script 15 : "Pour qui cette formation est faite"']}]},
+    {title:'Scripts 16-20 : CTA directs',dur:'PDF',content:[{type:'list',label:'Scripts',items:['Script 16 : Présentation simple + prix + lien','Script 17 : Comparaison avant/après','Script 18 : Urgence limitée','Script 19 : "3 choses incluses que tu ne sais pas"','Script 20 : Dernier rappel']}]},
+  ]},
+  {id:7,num:'BONUS 02',emoji:'💰',bg:'linear-gradient(135deg,#0A001A,#0E7490)',title:'Kit MRR — Licence + Page de Vente',color:'var(--purple2)',lessons:[
+    {title:'Licence MRR officielle',dur:'PDF',content:[{type:'text',label:'Ta licence',text:'Document PDF officiel. T\'autorise à revendre à 197€ et garder 100%. Chaque acheteur reçoit les mêmes droits.'}]},
+    {title:'Page de vente HTML',dur:'HTML',content:[{type:'text',label:'La page',text:'Fichier HTML complet. Upload sur Netlify (gratuit). Change ton prénom et ton lien Stripe.'}]},
+    {title:'Kit visuel Canva',dur:'CANVA',content:[{type:'text',label:'Les visuels',text:'Templates Canva : stories TikTok, miniatures, posts Instagram. Modifiables gratuitement.'}]},
+  ]},
+  {id:8,num:'BONUS 03',emoji:'💬',bg:'linear-gradient(135deg,#1A0010,#831843)',title:'Communauté Privée + Support',color:'#EC4899',lessons:[
+    {title:'Accès groupe Telegram',dur:'Accès vie',content:[{type:'text',label:'Le groupe',text:'Rejoins les autres membres. Partage tes premières ventes, pose tes questions. Lien dans Kit MRR.'}]},
+    {title:'FAQ live mensuel',dur:'Mensuel',content:[{type:'text',label:'Les sessions',text:'Chaque mois, session en direct. Dates annoncées dans le groupe Telegram.'}]},
+    {title:'Défi 30 premiers jours',dur:'Communauté',content:[{type:'text',label:'Le défi',text:'Challenge collectif : première vente en 30 jours. Ceux qui réussissent sont mentionnés dans le groupe.'}]},
+  ]},
+];
+
+// ══════════════════════════════════════════
+// PROGRESS HELPERS
+// ══════════════════════════════════════════
+function getLD(m,l){ const p=getProg(); return !!(p[m]&&p[m][l]); }
+function setLD(m,l,v){ const p=getProg(); if(!p[m])p[m]={}; p[m][l]=v; setProg(p); }
+function getMProg(id){ const m=MODULES[id]; const done=m.lessons.filter((_,i)=>getLD(id,i)).length; return{done,total:m.lessons.length,pct:Math.round(done/m.lessons.length*100)}; }
+function getTot(){ let d=0,t=0; MODULES.forEach(m=>m.lessons.forEach((_,i)=>{t++;if(getLD(m.id,i))d++;})); return{done:d,total:t,pct:Math.round(d/t*100)}; }
+function getCM(){ return MODULES.filter(m=>getMProg(m.id).pct===100).length; }
+
+// ══════════════════════════════════════════
+// RENDER CARD
+// ══════════════════════════════════════════
+function mkCard(mod,onclick){
+  const p=getMProg(mod.id);
+  let badge='';
+  if(p.pct===100) badge='<div class="mbadge bd">COMPLÉTÉ</div>';
+  else if(p.done>0) badge='<div class="mbadge bw">EN COURS</div>';
+  else if(mod.num.includes('BONUS')) badge='<div class="mbadge bb">BONUS</div>';
+  else if(mod.id===2) badge='<div class="mbadge bn">NOUVEAU</div>';
+  return`<div class="mc" onclick="${onclick}"><div class="mt" style="background:${mod.bg}"><div class="mto"></div>${badge}<div class="mpl">▶</div></div><div class="mi"><div class="mn">${mod.num}</div><div class="mm">${mod.title}</div><div class="mme"><div class="mlc">📹 ${mod.lessons.length} leçons</div><div class="pbw"><div class="pbb"><div class="pbf" style="width:${p.pct}%"></div></div><div class="ppc">${p.pct}%</div></div></div></div></div>`;
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+let prevPg='dashboard', curModId=0, curLesIdx=0;
+
+function renderDash(){
+  const t=getTot(); const cm=getCM();
+  document.getElementById('ws1').textContent=t.done;
+  document.getElementById('ws2').textContent=t.pct+'%';
+  document.getElementById('ws3').textContent=cm;
+  document.getElementById('pcnt').textContent=t.done+'/'+t.total;
+  document.getElementById('gbar').style.width=t.pct+'%';
+  document.getElementById('gpct').textContent=t.pct+'%';
+  const cols=['var(--cyan)','var(--purple2)','#EC4899','var(--red)','var(--cyan)','var(--gold)'];
+  document.getElementById('minibars').innerHTML=MODULES.slice(0,6).map((m,i)=>{const p=getMProg(m.id);return`<div class="mbi"><div class="mbl">M${m.id+1} ${m.title.split(' ')[0]}</div><div class="mbt"><div class="mbf" style="background:${cols[i]};width:${p.pct}%"></div></div></div>`;}).join('');
+  document.getElementById('dashgrid').innerHTML=MODULES.slice(0,6).map(m=>mkCard(m,`openMod(${m.id})`)).join('');
+  let rsub='Commence ta première leçon 👇';
+  for(let m of MODULES){const p=getMProg(m.id);if(p.pct>0&&p.pct<100){for(let i=0;i<m.lessons.length;i++){if(!getLD(m.id,i)){rsub=`Continue · ${m.title} · Leçon ${i+1}`;break;}}break;}}
+  document.getElementById('rsub').textContent=rsub;
+  const acts=[];
+  for(let m of MODULES){const p=getMProg(m.id);if(p.pct>0&&p.pct<100){for(let i=0;i<m.lessons.length;i++){if(!getLD(m.id,i)){acts.push({mid:m.id,li:i,icon:m.emoji,bg:m.bg,title:m.lessons[i].title,sub:m.num});break;}}}}
+  if(acts.length===0){for(let m of MODULES){if(getMProg(m.id).done===0){acts.push({mid:m.id,li:0,icon:m.emoji,bg:m.bg,title:m.lessons[0].title,sub:m.num+' · Commencer'});if(acts.length>=3)break;}}}
+  acts.push({mid:7,li:0,icon:'💰',bg:MODULES[7].bg,title:'Kit MRR',sub:'BONUS 02'});
+  document.getElementById('actlist').innerHTML=acts.slice(0,4).map(a=>`<div class="ai" onclick="openMod(${a.mid},${a.li})"><div class="aic" style="background:${a.bg}">${a.icon}</div><div class="ait"><div class="aitn">${a.title}</div><div class="aitss">${a.sub}</div></div><div style="color:var(--muted);font-size:12px;">▶</div></div>`).join('');
+}
+
+function renderAllMods(){ document.getElementById('allgrid').innerHTML=MODULES.map(m=>mkCard(m,`openMod(${m.id})`)).join(''); }
+
+// ══════════════════════════════════════════
+// MODULE DETAIL
+// ══════════════════════════════════════════
+function openMod(modId,lesIdx=-1){
+  prevPg=document.querySelector('.page.active')?.id?.replace('page-','')||'dashboard';
+  curModId=modId;
+  if(lesIdx===-1){lesIdx=0;for(let i=0;i<MODULES[modId].lessons.length;i++){if(!getLD(modId,i)){lesIdx=i;break;}}}
+  curLesIdx=lesIdx;
+  nav('module-detail',{title:MODULES[modId].title});
+  renderMD();
+}
+function goBack(){ nav(prevPg==='module-detail'?'modules':prevPg); }
+
+function renderMD(){
+  const mod=MODULES[curModId]; const les=mod.lessons[curLesIdx];
+  const p=getMProg(curModId); const isDone=getLD(curModId,curLesIdx);
+  document.getElementById('lsh').textContent=mod.title;
+  document.getElementById('lspt').textContent=p.pct+'%';
+  document.getElementById('lspf').style.width=p.pct+'%';
+  document.getElementById('ltitle').textContent=les.title;
+  const vids=getVideos(); const vurl=vids[curModId]&&vids[curModId][curLesIdx];
+  let vpH='';
+  if(vurl){
+    let eu=vurl;
+    if(vurl.includes('youtube.com/watch'))eu=vurl.replace('watch?v=','embed/').split('&')[0];
+    else if(vurl.includes('youtu.be/'))eu='https://www.youtube.com/embed/'+vurl.split('youtu.be/')[1].split('?')[0];
+    vpH=`<iframe src="${eu}" allowfullscreen></iframe>`;
+  }else{
+    vpH=`<div class="vpph"><div class="vpic">${mod.emoji}</div><div class="vptit">${les.title}</div><div class="vpsub">${les.dur} · ${mod.num}</div><button class="vpbtn" onclick="markDone()">▶ Marquer comme vu</button></div>`;
+  }
+  document.getElementById('vplayer').innerHTML=vpH;
+  document.getElementById('lesson-content').innerHTML=les.content.map(b=>{
+    if(b.type==='text')return`<div class="lc-block"><div class="lc-title">${b.label}</div><div class="lc-text">${b.text}</div></div>`;
+    if(b.type==='list')return`<div class="lc-block"><div class="lc-title">${b.label}</div><ul class="lc-list">${b.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+    if(b.type==='table')return`<div class="lc-block"><div class="lc-title">${b.label}</div><table class="lc-table"><thead><tr>${b.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,ci)=>`<td class="${b.colColors&&b.colColors[ci]?b.colColors[ci]:''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    return '';
+  }).join('');
+  const btn=document.getElementById('mdbtn');
+  btn.classList.toggle('done',isDone); btn.textContent=isDone?'✓ Déjà vu':'✓ Marquer comme vu';
+  document.getElementById('llist').innerHTML=mod.lessons.map((l,i)=>{
+    const done=getLD(curModId,i); const active=i===curLesIdx;
+    return`<div class="li ${active?'active':''} ${done?'completed':''}" onclick="selL(${i})"><div class="lck">${done?'✓':active?'▶':''}</div><div class="lln">${l.title}</div><div class="lld">${l.dur}</div></div>`;
+  }).join('');
+}
+
+function selL(i){ curLesIdx=i; renderMD(); }
+function markDone(){
+  if(!getLD(curModId,curLesIdx)){
+    setLD(curModId,curLesIdx,true); showToast('✓ Leçon validée !','success'); renderMD();
+    const m=MODULES[curModId];
+    if(curLesIdx<m.lessons.length-1){setTimeout(()=>{curLesIdx++;renderMD();},600);}
+    else{showToast('🎉 Module terminé !','success');}
+  }
+}
+function nextL(){ const m=MODULES[curModId]; if(curLesIdx<m.lessons.length-1){curLesIdx++;renderMD();}else showToast('Dernier de ce module !','info'); }
+function prevL(){ if(curLesIdx>0){curLesIdx--;renderMD();} }
+function resumeLearning(){ for(let m of MODULES){if(getMProg(m.id).pct<100){openMod(m.id);return;}} openMod(0); }
+
+// ══════════════════════════════════════════
+// PROGRESSION
+// ══════════════════════════════════════════
+function renderProg(){
+  const t=getTot();
+  document.getElementById('progdetail').innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:10px;">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px;margin-bottom:4px;">Progression globale : ${t.pct}%</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">${t.done} leçons vues sur ${t.total}</div>
+      <div style="height:9px;background:var(--bg3);border-radius:5px;overflow:hidden;"><div style="height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));width:${t.pct}%;border-radius:5px;"></div></div>
+    </div>
+    ${MODULES.map(m=>{const p=getMProg(m.id);return`<div class="prog-mod-card" onclick="openMod(${m.id})"><div style="display:flex;align-items:center;gap:12px;padding:14px 18px;"><div style="width:42px;height:42px;border-radius:10px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;">${m.emoji}</div><div style="flex:1"><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;">${m.title}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${m.num} · ${p.done}/${p.total} leçons</div></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:${p.pct===100?'var(--green)':'var(--purple2)'};">${p.pct}%</div></div><div style="height:3px;background:var(--bg3);"><div style="height:3px;background:${m.color};width:${p.pct}%;"></div></div></div>`;}).join('')}`;
+}
+
+// ══════════════════════════════════════════
+// MRR
+// ══════════════════════════════════════════
+function renderMRR(){
+  const tg=S.get('tg','');
+  const b=document.getElementById('tg-banner');
+  if(tg){b.style.display='flex';document.getElementById('tg-disp').textContent=tg;document.getElementById('tg-desc2').textContent='Lien configuré → '+tg;}
+  else{b.style.display='none';}
+}
+function openTg(){ const l=S.get('tg',''); if(l)window.open(l,'_blank'); else showToast('Lien Telegram non configuré','error'); }
+
+// ══════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════
+function renderAdmin(){
+  document.getElementById('tgInp').value=S.get('tg','');
+  renderEmailList();
+  const sel=document.getElementById('adminModSel');
+  sel.innerHTML='<option value="">-- Choisir un module --</option>'+MODULES.map(m=>`<option value="${m.id}">${m.num} — ${m.title}</option>`).join('');
+}
+
+function renderEmailList(){
+  const emails=getEmails();
+  const keys=Object.keys(emails);
+  document.getElementById('emailCountBadge').textContent=keys.length;
+  if(keys.length===0){ document.getElementById('emailList').innerHTML='<div class="email-empty">Aucun acheteur ajouté pour l\'instant.</div>'; return; }
+  document.getElementById('emailList').innerHTML=keys.map(e=>`
+    <div class="email-item">
+      <div>
+        <div class="email-addr">${e}</div>
+        <div class="email-date">${emails[e].date||'—'} ${emails[e].pwHash?'· 🔒 Compte créé':'· ⏳ Pas encore connecté'}</div>
+      </div>
+      <button class="email-del" onclick="delEmail('${e}')">Retirer</button>
+    </div>`).join('');
+}
+
+function addEmail(){
+  const raw=document.getElementById('newEmailInp').value.trim().toLowerCase();
+  if(!raw||!raw.includes('@')){ showToast('Email invalide','error'); return; }
+  const emails=getEmails();
+  if(emails[raw]){ showToast('Email déjà dans la liste','info'); return; }
+  emails[raw]={ date: new Date().toLocaleDateString('fr-FR'), pwHash: null };
+  setEmails(emails); document.getElementById('newEmailInp').value='';
+  renderEmailList(); showToast('✅ '+raw+' ajouté !','success');
+}
+
+function addBulkEmails(){
+  const raw=document.getElementById('bulkEmailInp').value;
+  const list=raw.split(/[\n,;]+/).map(e=>e.trim().toLowerCase()).filter(e=>e.includes('@'));
+  if(list.length===0){ showToast('Aucun email valide trouvé','error'); return; }
+  const emails=getEmails(); let added=0;
+  list.forEach(e=>{ if(!emails[e]){ emails[e]={date:new Date().toLocaleDateString('fr-FR'),pwHash:null}; added++; } });
+  setEmails(emails); document.getElementById('bulkEmailInp').value='';
+  renderEmailList(); showToast(`✅ ${added} email(s) ajouté(s) !`,'success');
+}
+
+function delEmail(e){
+  if(!confirm('Retirer '+e+' ? Cet acheteur perdra son accès.')) return;
+  const emails=getEmails(); delete emails[e]; setEmails(emails);
+  renderEmailList(); showToast('Email retiré','info');
+}
+
+function saveTg(){ S.set('tg',document.getElementById('tgInp').value.trim()); showToast('✅ Lien Telegram sauvegardé !','success'); }
+
+function saveAdminPw(){
+  const p1=document.getElementById('newAdminPw').value;
+  const p2=document.getElementById('newAdminPw2').value;
+  if(!p1||p1.length<4){ showToast('Mot de passe trop court','error'); return; }
+  if(p1!==p2){ showToast('Les mots de passe ne correspondent pas','error'); return; }
+  S.set('adminpw',p1); document.getElementById('newAdminPw').value=''; document.getElementById('newAdminPw2').value='';
+  showToast('✅ Mot de passe admin mis à jour !','success');
+}
+
+function renderAdminVids(){
+  const modId=document.getElementById('adminModSel').value;
+  document.getElementById('saveVidsBtn').style.display=modId?'block':'none';
+  if(!modId){ document.getElementById('adminVidsList').innerHTML=''; return; }
+  const mod=MODULES[parseInt(modId)]; const vids=getVideos(); const cv=vids[modId]||{};
+  document.getElementById('adminVidsList').innerHTML=mod.lessons.map((l,i)=>`
+    <div class="vrow">
+      <div class="vrow-name">${i+1}. ${l.title} <span style="color:var(--muted);">(${l.dur})</span></div>
+      <input class="vrow-inp ${cv[i]?'ok':''}" id="v${modId}${i}" value="${cv[i]||''}" placeholder="https://youtu.be/..." oninput="this.classList.toggle('ok',this.value.length>0)" />
+    </div>`).join('');
+}
+
+function saveVids(){
+  const modId=document.getElementById('adminModSel').value; if(!modId) return;
+  const mod=MODULES[parseInt(modId)]; const vids=getVideos();
+  if(!vids[modId]) vids[modId]={};
+  mod.lessons.forEach((_,i)=>{
+    const v=document.getElementById(`v${modId}${i}`)?.value.trim()||'';
+    if(v) vids[modId][i]=v; else delete vids[modId][i];
+  });
+  setVideos(vids); showToast('✅ Vidéos sauvegardées !','success'); renderAdminVids();
+}
+
+// SEARCH
+function searchM(q){
+  if(!q){renderAllMods();return;}
+  const f=MODULES.filter(m=>m.title.toLowerCase().includes(q.toLowerCase())||m.num.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('allgrid').innerHTML=f.length?f.map(m=>mkCard(m,`openMod(${m.id})`)).join(''):'<div style="color:var(--muted);font-size:13px;grid-column:1/-1;padding:20px;">Aucun module trouvé.</div>';
+}
+
+// TOAST
+let tt;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>
